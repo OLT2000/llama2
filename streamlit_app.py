@@ -30,7 +30,7 @@ GEOGRAPHY_PROMPT = "Thank you, and what is the expected geography of the case? (
 RESOURCES_PROMPT = "Thank you, and how many resources are you expecting to be working on this case? (**M+1**, **M+2**, **M+3**, **M+4**, Other)"
 
 NEXT_STEPS_PROMPT = (
-    "I now have all the information I need to generate a workplan for your case:\n\n"
+    "Let me summarise all the information you've provided so far:\n\n"
     "- **Case Industry**: Automotive & Mobility\n"
     "- **Problem to Solve**: Strategy\n"
     "- **Case length**: 6 weeks\n"
@@ -44,10 +44,10 @@ NEXT_STEPS_PROMPT = (
 
 WORKPLAN_PROMPT = (
     "Based on the information you've provided, here's a proposed workplan with detailed workstreams and timelines:\n\n"
-    "## **Proposed Workplan for Automotive Software Growth Strategy**\n\n"
-    "### **Suggested Workstreams:**\n\n"
+    "### **Proposed Workplan for Automotive Software Growth Strategy**\n\n"
+    "#### **Suggested Workstreams:**\n\n"
     "---\n\n"
-    "### **1. Market Model (Weeks 1-5)**\n"
+    "#### **1. Market Model (Weeks 1-5)**\n"
     "**Objective:** Build a robust market sizing model to estimate market growth in automotive software cut by geography, module, customer archetype. Show growth over time and forecast to 2050.\n"
     "- **Data and Assumption Gathering (Weeks 1-2):**\n"
     "    - Collect relevant data and define modeling assumptions\n"
@@ -58,10 +58,10 @@ WORKPLAN_PROMPT = (
     "    - Validate assumptions and refine growth projections\n"
     "    - **Output:** Market sizing model by geography, module, and customer archetype with forecasts to 2050.\n\n"
     "---\n\n"
-    "### **2. Competitive Landscape (Weeks 2-4)**\n"
+    "#### **2. Competitive Landscape (Weeks 2-4)**\n"
     "**Objective:** Identify and analyze Automotive SoftwareCo's competitors to inform positioning and strategy.\n"
     "- **Global Archetypes and Key Players (Weeks 2-3):**\n"
-    "    - Identify key competitor archetypes and players within each.\n"
+    "    - Identify key competitor archetypes and players within each (e.g. CDK, Reynolds & Reynolds, Tekion).\n"
     "    - **Sources:** Custom searches, industry associations, analyst reports.\n"
     "- **Zoom on Automotive SoftwareCo's Key Markets (Weeks 2-3):**\n"
     "    - Deep dive into Automotive SoftwareCo's specific geographic and product markets.\n"
@@ -70,7 +70,7 @@ WORKPLAN_PROMPT = (
     "    - Analyze competitor offerings, strengths, and weaknesses relative to Automotive SoftwareCo.\n"
     "    - **Sources:** Competitor annual reports, industry white papers, thought leadership.\n\n"
     "---\n\n"
-    "### **3. Survey / Qualitative Data Gathering (Weeks 1-5)**\n"
+    "#### **3. Survey / Qualitative Data Gathering (Weeks 1-5)**\n"
     "**Objective:** Gather insights from key Automotive SoftwareCo stakeholders and industry experts to inform strategic recommendations.\n"
     "- **Executive Survey Set-Up (Week 1):**\n"
     "    - Define question list.\n"
@@ -84,7 +84,7 @@ WORKPLAN_PROMPT = (
     "    - Develop visual outputs and insights.\n"
     "    - **Example Output:** Heatmap of priority focus areas.\n\n"
     "---\n\n"
-    "### **4. Product (Weeks 3-5)**\n"
+    "#### **4. Product (Weeks 3-5)**\n"
     "**Objective:** Understand product positioning and customer archetypes for Automotive SoftwareCo and competitors.\n"
     "- **DMS Product Overview (Weeks 3-5):**\n"
     "    - Analyze key modules, functionality, and market penetration.\n"
@@ -95,7 +95,7 @@ WORKPLAN_PROMPT = (
     "    - Deep dive into Automotive SoftwareCo's products and customer segmentation.\n"
     "    - **Sources:** Internal client reports, industry benchmarks.\n\n"
     "---\n\n"
-    "### **5. Synthesis and Recommendation (Weeks 4-6)**\n"
+    "#### **5. Synthesis and Recommendation (Weeks 4-6)**\n"
     "**Objective:** Deliver actionable strategic initiatives and a roadmap for implementation for Automotive SoftwareCo.\n"
     "- **Strategic Initiative Development (Weeks 4-5):**\n"
     "    - Prioritize based on geographies, customer archetypes, and competitive positioning.\n"
@@ -195,9 +195,10 @@ def clear_chat_history():
     st.session_state['response_index'] = 0
 
 st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
+streaming = False
 
 # Handle user input
-if prompt := st.chat_input():
+if prompt := st.chat_input(disabled=streaming):
     st.session_state['messages'].append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -214,6 +215,7 @@ if st.session_state['response_index'] == 0:
     st.session_state['messages'].append({"role": "assistant", "content": response_text})
 
 elif st.session_state['response_index'] < len(gpt_responses) and st.session_state['response_index'] > 0:
+    streaming = True
     response_text = gpt_responses[st.session_state['response_index']]
     full_response = ""
     
@@ -235,7 +237,7 @@ elif st.session_state['response_index'] < len(gpt_responses) and st.session_stat
             st.write("I hope this helps! Let me know if you have any questions.")
             placeholder.markdown(full_response)
         
-
+    streaming = False
     st.session_state['messages'].append({"role": "assistant", "content": full_response})
 
 
