@@ -1,13 +1,19 @@
 import streamlit as st
+from pathlib import Path
 import time
+import base64
+import os
+import random
 
 # App title
 st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
 
+image_path = Path(__file__).parent  / "poc_gantt.png"
+pptx_gantt_path = Path(__file__).parent  / "poc_gantt.pptx"
 
 # Store LLM generated responses
 INTRO_PROMPT = (
-    "GPT: Hi **%s** - let's gather some key details about your case to get started. "
+    "Hi, I'm a workflow automation tool. To begin, let's gather some key details about your case to get started. "
     "If you don't know something, you can leave it blank. To start with, could you provide a one-line summary of the project?"
 )
 
@@ -102,23 +108,23 @@ WORKPLAN_PROMPT = (
 
 WEEK_1_PROMPT = (
     "Sure, here are the key priorities for the first week, split by workstream:\n"
-    "### **1. Market Model**\n"
+    "#### **1. Market Model**\n"
     "**Data and Assumption Gathering:**\n"
     "- Collect relevant data and define modeling assumptions\n"
     "- **Sources:** S&P Capital IQ, competitor reports, analyst data\n"
     "**Model Setup + Driver Tree:**\n"
     "- Structure a market sizing framework with key drivers\n"
-    "### **3. Survey / Qualitative Data Gathering**\n"
+    "#### **3. Survey / Qualitative Data Gathering**\n"
     "- Define question list\n"
     "- Define interviewee/recipient list\n"
     "- Schedule calls / code survey\n"
     "\n"
-    "GPT: Does this workflow align with your vision for the engagement? Let me know if adjustments or additional details are needed!"
+    "Does this workflow align with your vision for the engagement? Let me know if adjustments or additional details are needed!"
 )
 
 SCHEDULE_PROMPT = (
-    "**GPT:** Sure, see below a set of suggested meetings you can schedule to get started:\n\n"
-    "### **Key Meetings to Schedule:**\n"
+    " Sure, see below a set of suggested meetings you can schedule to get started:\n\n"
+    "**Key Meetings to Schedule:**\n"
     "- **Internal**\n"
     "    - Stand-ups and check-outs (daily)\n"
     "    - Partner 'content'/ problem-solving sessions (daily)\n"
@@ -128,13 +134,13 @@ SCHEDULE_PROMPT = (
     "    - Data gathering calls with relevant client stakeholders (Weeks 1 and 2)\n"
     "    - **Senior leadership Steering Committees for Weeks 3 and 6**\n"
     "\n"
-    "**GPT:** Is there anything else you need from me today?"
+    " Is there anything else you need from me today?"
 )
 
 
 # Predefined GPT responses
 gpt_responses = [
-    # INTRO_PROMPT,
+    INTRO_PROMPT,
     INFERRED_CONTEXT_RESPONSE,
     GEOGRAPHY_PROMPT,
     RESOURCES_PROMPT,
@@ -150,10 +156,12 @@ if 'response_index' not in st.session_state:
     st.session_state['response_index'] = 0
 
 if 'messages' not in st.session_state:
-    st.session_state['messages'] = []
+    st.session_state['messages'] = [
+        # {"role": "assistant", "content": INTRO_PROMPT}
+    ]
 
 # Define text streamer
-def text_streamer(text, chunk_size=5, delay=0.1):
+def text_streamer(text, chunk_size=5, delay=0.05):
     """
     Generator function to simulate streaming by yielding chunks of text.
 
@@ -168,6 +176,13 @@ def text_streamer(text, chunk_size=5, delay=0.1):
     for i in range(0, len(text), chunk_size):
         yield text[i:i + chunk_size]
         time.sleep(delay)
+
+def get_binary_file_downloader_html(bin_file, file_label='File'):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    bin_str = base64.b64encode(data).decode()
+    href = f'You can download the Gantt chart <a href="data:application/octet-stream;base64,{bin_str}" download="{os.path.basename(bin_file)}">here</a>'
+    return href
 
 # Display chat messages
 for message in st.session_state['messages']:
@@ -189,7 +204,16 @@ if prompt := st.chat_input():
     st.session_state['response_index'] += 1
 
 # Generate assistant response
-if st.session_state['response_index'] < len(gpt_responses):
+if st.session_state['response_index'] == 0:
+    response_text = gpt_responses[st.session_state['response_index']]
+    
+    with st.chat_message("assistant"):
+        placeholder = st.empty()
+        placeholder.markdown(response_text)
+
+    st.session_state['messages'].append({"role": "assistant", "content": response_text})
+
+elif st.session_state['response_index'] < len(gpt_responses) and st.session_state['response_index'] > 0:
     response_text = gpt_responses[st.session_state['response_index']]
     full_response = ""
     
@@ -201,7 +225,17 @@ if st.session_state['response_index'] < len(gpt_responses):
         for chunk in text_streamer(response_text):
             full_response += chunk
             placeholder.markdown(full_response)
-        placeholder.markdown(full_response)
+
+        if st.session_state['response_index'] == 5:
+            for chunk in text_streamer("\n\nI've also generated a Gantt chart for you to see the timeline of the project."):
+                full_response += chunk
+            image_bytes = open(image_path, "rb").read()
+            st.image(image_path)
+            st.write(get_binary_file_downloader_html(pptx_gantt_path, "Gantt Chart"), unsafe_allow_html=True)
+            st.write("I hope this helps! Let me know if you have any questions.")
+            placeholder.markdown(full_response)
         
 
     st.session_state['messages'].append({"role": "assistant", "content": full_response})
+
+
