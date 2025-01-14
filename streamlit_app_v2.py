@@ -134,7 +134,7 @@ SCHEDULE_PROMPT = (
 
 # Predefined GPT responses
 gpt_responses = [
-    INTRO_PROMPT,
+    # INTRO_PROMPT,
     INFERRED_CONTEXT_RESPONSE,
     GEOGRAPHY_PROMPT,
     RESOURCES_PROMPT,
@@ -194,19 +194,14 @@ if st.session_state['response_index'] < len(gpt_responses):
     full_response = ""
     
     with st.chat_message("assistant"):
-        if st.session_state['response_index'] >= 4:
+        if st.session_state['response_index'] > 4:
             with st.spinner('Thinking...'):
-                placeholder = st.empty()
-                for chunk in text_streamer(response_text):
-                    full_response += chunk
-                    placeholder.markdown(full_response)
-                placeholder.markdown(full_response)
-        
-        else:
-            placeholder = st.empty()
-            for chunk in text_streamer(response_text):
-                full_response += chunk
-                placeholder.markdown(full_response)
+                time.sleep(3)
+        placeholder = st.empty()
+        for chunk in text_streamer(response_text):
+            full_response += chunk
             placeholder.markdown(full_response)
+        placeholder.markdown(full_response)
+        
 
     st.session_state['messages'].append({"role": "assistant", "content": full_response})
