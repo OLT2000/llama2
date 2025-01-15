@@ -120,16 +120,17 @@ WORKPLAN_PROMPT = (
 )
 
 WEEK_1_PROMPT = (
-    "### **1. Market Model: Sylvia, Tom**\n"
+    "Sure, see below the team’s suggested priorities for Week 1:"
+    "#### **1. Market Model: Sylvia, Tom**\n"
     "**Data and Assumption Gathering:**\n"
     "- Collect relevant data and define modeling assumptions\n"
     "- **Sources:** S&P Capital IQ, competitor reports, analyst data\n"
     "**Model Setup + Driver Tree:**\n"
     "- Structure a market sizing framework with key drivers\n"
-    "### **2. Competitive Landscape: Chelsea, Brian**\n"
+    "#### **2. Competitive Landscape: Chelsea, Brian**\n"
     "- Identify key competitor archetypes and players within each, EPS comparison\n"
     "- **Sources:** Custom searches, industry associations, analyst reports\n"
-    "### **3. Survey / Qualitative Data Gathering: Laura, Diego**\n"
+    "#### **3. Survey / Qualitative Data Gathering: Laura, Diego**\n"
     "- **Executive Survey Set-Up:**\n"
     "    - Define question list\n"
     "    - Define interviewee/recipient list\n"
