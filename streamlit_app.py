@@ -120,7 +120,7 @@ WORKPLAN_PROMPT = (
 )
 
 WEEK_1_PROMPT = (
-    "Sure, see below the team’s suggested priorities for Week 1:"
+    "Sure, see below the team’s suggested priorities for Week 1:\n"
     "#### **1. Market Model: Sylvia, Tom**\n"
     "**Data and Assumption Gathering:**\n"
     "- Collect relevant data and define modeling assumptions\n"
@@ -150,7 +150,7 @@ SCHEDULE_PROMPT = (
     "    - Check-in meetings with client counterparts (daily)\n"
     "    - Data gathering calls with relevant client stakeholders (Weeks 1 and 2)\n"
     "    - **Senior leadership Steering Committees for Weeks 3 and 6**\n"
-    "Would you like me to check your team and client stakeholder availabilities and get these calls scheduled?"
+    "\nWould you like me to check your team and client stakeholder availabilities and get these calls scheduled?"
 )
 
 
